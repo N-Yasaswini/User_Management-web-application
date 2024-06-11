@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>/* style.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+li:hover {
+    background-color: #eaeaea;
+}
+</style>
+</head>
+<body>
+    <h1>User Management</h1>
+    <h2>Add User</h2>
+    <form id="addUserForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Add User</button>
+    </form>
+    <h2>Users</h2>
+    <ul id="userList"></ul>
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    console.log('JavaScript loaded');
+    const userList = document.getElementById('userList');
+    const addUserForm = document.getElementById('addUserForm');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
+    function fetchUsers() {
+        fetch('/users')
+            .then(response => response.json())
+            .then(users => {
+                console.log('Fetched users:', users); // Add logging here
+                userList.innerHTML = ''; // Clear the list before adding new users
+                users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.textContent = `ID: ${user.id}, Username: ${user.username}, Email: ${user.email}`;
+                    userList.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error fetching users:', error));
+    }
+
+    addUserForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const data = {
+            username: usernameInput.value,
+            email: emailInput.value,
+            password: passwordInput.value
+        };
+
+        fetch('/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log('Add user response:', response); // Add logging here
+            return response.json();
+        })
+        .then(result => {
+            console.log('Result after adding user:', result); // Add logging here
+            fetchUsers();
+            addUserForm.reset();
+        })
+        .catch(error => console.error('Error adding user:', error));
+    });
+
+    // Fetch users when the page loads
+    fetchUsers();
+});
+
+</script>
+</body>
+</html>
